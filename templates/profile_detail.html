@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <div class="usto-detail-page">
+
+        <!-- USTO PROFILE -->
+        <div class="usto-profile-card">
+
+            <div class="usto-avatar">
+                {% if usto.avatar %}
+                <img src="{{ usto.avatar.url }}" alt="{{ usto.user.username }}">
+                {% else %}
+                <div class="default-avatar">👤</div>
+                {% endif %}
+            </div>
+
+            <div class="usto-info">
+                <h1>{{ usto.user.username }}</h1>
+
+                {% if usto.city %}
+                <p>📍 {{ usto.city }}</p>
+                {% endif %}
+
+                <p>🛠️ Таҷриба: {{ usto.experience }} сол</p>
+
+                {% if usto.phone %}
+                <p>📞 {{ usto.phone }}</p>
+                <a href="tel:{{ usto.phone }}" class="call-btn">
+                    Звонить мастеру
+                </a>
+                {% endif %}
+
+                {% if usto.description %}
+                <div class="usto-description">
+                    <h3>О мастере</h3>
+                    <p>{{ usto.description }}</p>
+                </div>
+                {% endif %}
+
+                {% if user.is_authenticated and user == usto.user %}
+                <a href="{% url 'update_profile' usto.pk %}" class="edit-btn">
+                    Редактировать профиль
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+
+        <!-- ADVERTISEMENTS -->
+        <div class="advertisements-section">
+
+            <div class="section-heading">
+                <h2>Объявления мастера</h2>
+                <span>{{ advertisements.count }} объявлений</span>
+            </div>
+
+            <div class="advertisements-grid">
+
+                {% for advertisement in advertisements %}
+
+                <div class="advertisement-card">
+
+                    <a href="{% url 'advertisement_detail' advertisement.pk %}">
+
+                        {% with first_image=advertisement.images.first %}
+                        {% if first_image %}
+                        <img src="{{ first_image.image.url }}" alt="{{ advertisement.title }}">
+                        {% else %}
+                        <div class="no-image">Нет фотографии</div>
+                        {% endif %}
+                        {% endwith %}
+
+                        <div class="advertisement-info">
+                            <h3>{{ advertisement.title }}</h3>
+
+                            {% if advertisement.price %}
+                            <p class="price">{{ advertisement.price }} сомони</p>
+                            {% else %}
+                            <p class="price">Договорная цена</p>
+                            {% endif %}
+
+                            <p class="city">📍 {{ advertisement.city }}</p>
+
+                            <small>
+                                {{ advertisement.created_at|date:"d.m.Y" }}
+                            </small>
+                        </div>
+
+                    </a>
+
+                </div>
+
+                {% empty %}
+
+                <div class="empty-advertisements">
+                    <p>У этого мастера пока нет активных объявлений.</p>
+
+                </div>
+                {% if user.is_authenticated and user == usto.user %}
+
+                <a href="{% url 'update_profile' usto.pk %}">
+                    Edit Profile
+                </a>
+
+                <form method="post" action="{% url 'delete_profile' usto.pk %}">
+                    {% csrf_token %}
+                    <button type="submit" onclick="return confirm('Вы уверены, что хотите удалить профиль?')">
+                        Delete Profile
+                    </button>
+                </form>
+
+                {% endif %}
+
+                {% endfor %}
+
+            </div>
+        </div>
+
+    </div>
+
+</body>
+
+</html>

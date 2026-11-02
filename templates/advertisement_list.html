@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    {% for advertisement in advertisements %}
+
+    <div>
+
+        <a href="{% url 'advertisement_detail' advertisement.pk %}">
+
+            {% if advertisement.images.first %}
+                <div>
+                    {% if advertisement.promotion_priority == 2 %}
+                        <span>TOP</span>
+                    {% elif advertisement.promotion_priority == 1 %}
+                        <span>PREMIUM</span>
+                    {% endif %}
+
+                    <img src="{{ advertisement.images.first.image.url }}"
+                         alt="{{ advertisement.title }}">
+                </div>
+            {% endif %}
+
+            <h3>{{ advertisement.title }}</h3>
+
+            <p>{{ advertisement.price }} сомони</p>
+
+            <p>{{ advertisement.city }}</p>
+
+            <p>⭐ {{ advertisement.rating|default:0|floatformat:1 }}</p>
+
+            <p>👁 {{ advertisement.views_count }}</p>
+
+        </a>
+
+    </div>
+
+{% endfor %}
+</body>
+</html>

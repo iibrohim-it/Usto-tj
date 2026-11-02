@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+
+<h1>Мои отзывы</h1>
+
+{% for review in reviews %}
+
+    <div>
+        <h3>
+            <a href="{% url 'advertisement_detail' review.advertisement.pk %}">
+                {{ review.advertisement.title }}
+            </a>
+        </h3>
+
+        <p>Оценка: {{ review.rating }} / 5</p>
+
+        <p>{{ review.comment }}</p>
+
+        <p>{{ review.created_at|date:"d.m.Y H:i" }}</p>
+    </div>
+
+    <hr>
+
+{% empty %}
+
+    <p>Вы ещё не оставили отзывов.</p>
+
+    <a href="{% url 'update_review' review.pk %}">Update</a>
+
+    <form action="{% url 'delete_review' review.pk %}" method="post">
+        {% csrf_token %}
+        <button type="submit">Delete</button>
+    </form>
+
+
+</body>
+</html>

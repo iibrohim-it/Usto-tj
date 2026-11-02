@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categories | YouTube</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-[#0f0f0f] text-white min-h-screen">
+
+    <!-- Navbar -->
+    <nav class="bg-[#181818] border-b border-gray-800 px-8 py-5 flex justify-between items-center">
+
+        <div class="flex items-center gap-3">
+            <div class="bg-red-600 rounded-xl p-2">
+                <span class="text-xl">▶</span>
+            </div>
+
+            <h1 class="text-2xl font-bold">
+                YouTube <span class="text-gray-400 text-sm">Categories</span>
+            </h1>
+        </div>
+
+    </nav>
+
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-6 py-12">
+
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row justify-between items-center gap-6 mb-10">
+
+            <div>
+                <h2 class="text-4xl font-bold mb-3">
+                    All Categories
+                </h2>
+
+                <p class="text-gray-400">
+                    Discover videos from your favorite categories.
+                </p>
+            </div>
+
+            {% if user.is_superuser or user.is_staff %}
+            <a href="{% url 'create_category' %}"
+                class="bg-red-600 hover:bg-red-700 px-6 py-3 rounded-xl font-semibold transition">
+                + Add Category
+            </a>
+            {% endif %}
+
+        </div>
+
+
+        <!-- Search -->
+        <div class="mb-10">
+            <input type="text" id="categorySearch" placeholder="Search categories..."
+                class="w-full md:w-96 bg-[#222] border border-gray-700 rounded-xl px-5 py-3 outline-none focus:border-red-500 transition">
+        </div>
+
+
+        <!-- Categories Grid -->
+        <div id="categoryList" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+
+            {% for category in categories %}
+
+            <div
+                class="category-card bg-[#1c1c1c] border border-gray-800 rounded-2xl p-6 hover:border-red-500 hover:-translate-y-1 transition duration-300">
+
+                <!-- Icon -->
+                <div class="w-16 h-16 bg-red-600/20 rounded-2xl flex items-center justify-center mb-5">
+                    <span class="text-3xl">🎬</span>
+                </div>
+
+                <!-- Name -->
+                <h3 class="category-name text-xl font-bold mb-4">
+                    {{ category.name }}
+                </h3>
+
+                <!-- Status -->
+                <div class="flex items-center justify-between mb-5">
+
+                    {% if category.is_active %}
+                    <span class="bg-green-500/10 text-green-400 px-3 py-1 rounded-full text-xs font-semibold">
+                        ● Active
+                    </span>
+                    {% else %}
+                    <span class="bg-red-500/10 text-red-400 px-3 py-1 rounded-full text-xs font-semibold">
+                        ● Inactive
+                    </span>
+                    {% endif %}
+
+                    <span class="text-gray-500 text-xs">
+                        #{{ category.id }}
+                    </span>
+
+                </div>
+
+                <!-- Created Date -->
+                <p class="text-gray-500 text-sm border-t border-gray-800 pt-4">
+                    Created: {{ category.created_at|date:"d.m.Y" }}
+                </p>
+
+            </div>
+
+            {% empty %}
+
+            <div class="col-span-full text-center py-20">
+
+                <div class="text-6xl mb-5">📂</div>
+
+                <h3 class="text-2xl font-bold mb-3">
+                    No Categories Yet
+                </h3>
+
+                <p class="text-gray-400">
+                    There are no categories available.
+                </p>
+
+            </div>
+            {% if user.is_superuser or user.is_staff %}
+
+            <div class="flex gap-3 mt-4">
+
+                <a href="{% url 'update_category' category.pk %}"
+                    class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg">
+                    Изменить
+                </a>
+
+                <form action="{% url 'delete_category' category.pk %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit">Удалить</button>
+                </form>
+
+            </div>
+
+            {% endif %}
+
+            {% endfor %}
+
+        </div>
+
+    </main>
+
+
+    <!-- Footer -->
+    <footer class="border-t border-gray-800 text-center py-6 text-gray-500 text-sm">
+        © 2026 YouTube Clone. All rights reserved.
+    </footer>
+
+
+    <!-- Search -->
+    <script>
+        const searchInput = document.getElementById('categorySearch');
+
+        searchInput.addEventListener('input', function () {
+
+            const value = this.value.toLowerCase();
+
+            document.querySelectorAll('.category-card').forEach(card => {
+
+                const name = card.querySelector('.category-name')
+                    .textContent.toLowerCase();
+
+                card.style.display = name.includes(value) ? '' : 'none';
+
+            });
+
+        });
+    </script>
+
+</body>
+
+</html>

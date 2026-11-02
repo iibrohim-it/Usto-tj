@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+     
+<div class="email-sent-container">
+    <div class="email-sent-card">
+        <div class="email-icon">📧</div>
+
+        <h2>Проверьте свою почту!</h2>
+
+        <p>
+            Мы отправили ссылку для активации аккаунта на ваш email:
+        </p>
+
+        <strong>{{ email }}</strong>
+
+        <p>
+            Перейдите по ссылке в письме, чтобы активировать аккаунт.
+        </p>
+
+        <a href="{% url 'login' %}">Перейти ко входу</a>
+    </div>
+</div>
+
+</body>
+</html>

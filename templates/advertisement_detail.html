@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <title>{{ advertisement.title }}</title>
+</head>
+
+<body>
+
+    <header>
+        <h1>Usto TJ</h1>
+        <nav>
+            <a href="{% url 'advertisement_list' %}">Главная</a>
+            <a href="{% url 'my_advertisements' %}">Мои объявления</a>
+        </nav>
+    </header>
+
+    <hr>
+
+    <main>
+
+        <!-- Информация об объявлении -->
+        <section>
+
+            <h1>{{ advertisement.title }}</h1>
+
+            {% if active_promotion %}
+            {% if active_promotion.promotion_type == 'top' %}
+            <strong>TOP</strong>
+            {% elif active_promotion.promotion_type == 'premium' %}
+            <strong>PREMIUM</strong>
+            {% endif %}
+            {% endif %}
+
+            <p>Город: {{ advertisement.city }}</p>
+            <p>Цена: {{ advertisement.price|default:"Договорная" }} сомони</p>
+            <p>Категория: {{ advertisement.category }}</p>
+            <p>Дата публикации: {{ advertisement.created_at|date:"d.m.Y" }}</p>
+            <p>Рейтинг: {{ advertisement.average_rating|floatformat:1 }}</p>
+            <p>Просмотры: {{ views_count }}</p>
+
+        </section>
+
+        <hr>
+
+        <!-- Фотографии -->
+        <h2>Фотографии</h2>
+
+        {% for image in advertisement.images.all %}
+        <img src="{{ image.image.url }}" width="300">
+        {% empty %}
+        <p>Фотографий нет</p>
+        {% endfor %}
+
+
+        <h2>Видео</h2>
+
+        {% if advertisement.video %}
+        <video width="500" controls>
+            <source src="{{ advertisement.video.video.url }}">
+        </video>
+        {% else %}
+        <p>Видео нет</p>
+        {% endif %}
+
+        <hr>
+
+        <!-- Описание -->
+        <section>
+            <h2>Описание объявления</h2>
+            <p>{{ advertisement.description|linebreaks }}</p>
+        </section>
+
+        <hr>
+
+        <!-- Действия владельца -->
+        {% if request.user == advertisement.usto.user %}
+        <section>
+            <h2>Управление объявлением</h2>
+
+            <a href="{% url 'advertisement_update' advertisement.pk %}">
+                Редактировать
+            </a>
+
+            <br><br>
+
+            <a href="{% url 'advertisement_delete' advertisement.pk %}">
+                Удалить
+            </a>
+        </section>
+        {% else %}
+
+        <!-- Избранное -->
+        {% if request.user.is_authenticated %}
+        <form method="post" action="{% url 'favorite_toggle' advertisement.pk %}">
+            {% csrf_token %}
+
+            {% if is_favorite %}
+            <button type="submit">Удалить из избранного</button>
+            {% else %}
+            <button type="submit">Добавить в избранное</button>
+            {% endif %}
+        </form>
+        {% else %}
+        <a href="{% url 'login' %}">Войдите, чтобы добавить в избранное</a>
+        {% endif %}
+
+        {% endif %}
+
+        <hr>
+
+        <!-- Профиль мастера -->
+        <section>
+            <h2>Информация о мастере</h2>
+
+            <p>{{ advertisement.usto.user.get_full_name }}</p>
+
+            <a href="{% url 'usto_detail' advertisement.usto.pk %}">
+                Смотреть профиль мастера
+            </a>
+        </section>
+
+        <hr>
+
+        <!-- Отзывы -->
+        <section>
+            <h2>Отзывы</h2>
+
+            {% for review in advertisement.reviews.all %}
+            <article>
+                <p>{{ review.user.username }}</p>
+                <p>Оценка: {{ review.rating }} / 5</p>
+                <p>{{ review.comment }}</p>
+                <small>{{ review.created_at|date:"d.m.Y H:i" }}</small>
+            </article>
+            <hr>
+            {% empty %}
+            <p>Пока нет отзывов.</p>
+            {% if request.user.is_authenticated and request.user == advertisement.usto.user %}
+
+            <h2>Управление объявлением</h2>
+
+            <a href="{% url 'update_advertisement' advertisement.pk %}">
+                Редактировать
+            </a>
+
+            <form method="post" action="{% url 'delete_advertisement' advertisement.pk %}">
+                {% csrf_token %}
+                <button type="submit">Удалить</button>
+            </form>
+
+            {% endif %}
+            {% endfor %}
+        </section>
+
+        <hr>
+
+        <!-- Форма отзыва -->
+        {% if request.user.is_authenticated %}
+        {% if request.user != advertisement.usto.user %}
+        <section>
+            <h2>Оставить отзыв</h2>
+
+            <form method="post" action="{% url 'create_review' advertisement.pk %}">
+                {% csrf_token %}
+
+                <label>Оценка:</label>
+                <select name="rating" required>
+                    <option value="5">5 - Отлично</option>
+                    <option value="4">4 - Хорошо</option>
+                    <option value="3">3 - Нормально</option>
+                    <option value="2">2 - Плохо</option>
+                    <option value="1">1 - Очень плохо</option>
+                </select>
+
+                <br><br>
+
+                <label>Комментарий:</label>
+                <textarea name="comment" required></textarea>
+
+                <br><br>
+
+                <button type="submit">Отправить отзыв</button>
+            </form>
+        </section>
+        {% endif %}
+        {% else %}
+        <a href="{% url 'login' %}">Войдите, чтобы оставить отзыв</a>
+        {% endif %}
+
+    </main>
+
+</body>
+
+</html>

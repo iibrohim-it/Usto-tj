@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+
+<div class="max-w-7xl mx-auto px-4 py-8">
+
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-800">
+                Мои объявления
+            </h1>
+            <p class="text-gray-500 mt-2">
+                Управляйте своими объявлениями
+            </p>
+        </div>
+
+        <a href="{% url 'create_advertisement' %}"
+           class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl font-semibold">
+            + Добавить объявление
+        </a>
+    </div>
+
+    <!-- Advertisements -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+        {% for advertisement in advertisements %}
+
+        <div class="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-100">
+
+            <!-- Image -->
+            <div class="relative">
+                {% with image=advertisement.images.first %}
+                    {% if image %}
+                        <img src="{{ image.image.url }}"
+                             class="w-full h-52 object-cover"
+                             alt="{{ advertisement.title }}">
+                    {% else %}
+                        <div class="w-full h-52 bg-gray-200 flex items-center justify-center">
+                            <span class="text-gray-400">Нет фотографии</span>
+                        </div>
+                    {% endif %}
+                {% endwith %}
+
+                <!-- Promotion badge -->
+                {% for promotion in advertisement.promotions.all %}
+                    {% if promotion.status == 'active' %}
+                        {% if promotion.promotion_type == 'top' %}
+                            <span class="absolute top-3 left-3 bg-yellow-400 text-black px-3 py-1 rounded-full text-xs font-bold">
+                                TOP
+                            </span>
+                        {% elif promotion.promotion_type == 'premium' %}
+                            <span class="absolute top-3 left-3 bg-purple-600 text-white px-3 py-1 rounded-full text-xs font-bold">
+                                PREMIUM
+                            </span>
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+            </div>
+
+            <!-- Content -->
+            <div class="p-5">
+
+                <h2 class="text-xl font-bold text-gray-800 mb-2">
+                    {{ advertisement.title }}
+                </h2>
+
+                <p class="text-gray-500 text-sm mb-3">
+                    {{ advertisement.description|truncatewords:15 }}
+                </p>
+
+                <div class="text-2xl font-bold text-blue-600 mb-4">
+                    {{ advertisement.price }} сомони
+                </div>
+
+                <!-- Statistics -->
+                <div class="flex justify-between text-sm text-gray-500 border-t border-b py-3 mb-4">
+                    <span>👁 {{ advertisement.views_count }}</span>
+
+                    <span>
+                        ⭐
+                        {% if advertisement.rating %}
+                            {{ advertisement.rating|floatformat:1 }}
+                        {% else %}
+                            Нет отзывов
+                        {% endif %}
+                    </span>
+                </div>
+
+                <div class="text-sm text-gray-400 mb-4">
+                    {{ advertisement.created_at|date:"d.m.Y" }}
+                </div>
+
+                <!-- Buttons -->
+                <div class="flex gap-2">
+
+                    <a href="{% url 'advertisement_detail' advertisement.pk %}"
+                       class="flex-1 text-center bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded-lg font-medium">
+                        Подробнее
+                    </a>
+
+                    <a href="{% url 'update_advertisement' advertisement.pk %}"
+                       class="flex-1 text-center bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-medium">
+                        Изменить
+                    </a>
+
+                    <form action="{% url 'delete_advertisement' advertisement.pk %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit">Удалить</button>
+                    </form>
+
+                </div>
+
+            </div>
+        </div>
+
+        {% empty %}
+
+        <div class="col-span-full text-center py-20 bg-white rounded-2xl shadow">
+            <div class="text-5xl mb-4">📢</div>
+            <h2 class="text-xl font-bold text-gray-700">
+                У вас пока нет объявлений
+            </h2>
+            <p class="text-gray-500 mt-2">
+                Создайте своё первое объявление
+            </p>
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Редактировать объявление</title>
+</head>
+<body>
+
+    <h1>Редактировать объявление</h1>
+    <p>Измените информацию о своём объявлении.</p>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        {{ form.as_p }}
+
+        <hr>
+
+        <h2>Текущие фотографии</h2>
+
+        {% for image in advertisement.images.all %}
+            <img src="{{ image.image.url }}" width="150">
+        {% empty %}
+            <p>Фотографий нет.</p>
+        {% endfor %}
+
+        <h2>Текущее видео</h2>
+
+        {% if advertisement.video %}
+            <video width="300" controls>
+                <source src="{{ advertisement.video.video.url }}">
+            </video>
+        {% else %}
+            <p>Видео нет.</p>
+        {% endif %}
+
+        <hr>
+
+        <h2>Продвижение объявления</h2>
+
+        {% if active_promotion %}
+
+            <p>
+                Ваше объявление уже продвигается:
+                {{ active_promotion.get_promotion_type_display }}
+            </p>
+
+            <p>
+                До: {{ active_promotion.end_date|date:"d.m.Y H:i" }}
+            </p>
+
+        {% else %}
+
+            <p>Ваше объявление обычное.</p>
+            <p>Вы можете выбрать Premium или TOP для продвижения.</p>
+
+            <h3>Premium</h3>
+
+            {% for days, price in promotion_prices.premium.items %}
+                <p>{{ days }} дней — {{ price }} сомони</p>
+            {% endfor %}
+
+            <h3>TOP</h3>
+
+            {% for days, price in promotion_prices.top.items %}
+                <p>{{ days }} дней — {{ price }} сомони</p>
+            {% endfor %}
+
+            <a href="{% url 'create_promotion' advertisement.pk %}">
+                Продвинуть объявление
+            </a>
+
+        {% endif %}
+
+        <br><br>
+
+        <button type="submit">Сохранить изменения</button>
+
+        <a href="{% url 'advertisement_detail' advertisement.pk %}">
+            Отмена
+        </a>
+
+    </form>
+
+</body>
+</html>

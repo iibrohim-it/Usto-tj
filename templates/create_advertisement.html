@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+<h1>Создать объявление</h1>
+
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    {{ form.as_p }}
+
+    <h3>Продвижение объявления</h3>
+
+    <label>Тип продвижения:</label>
+    <select name="promotion_type">
+        <option value="">Без продвижения</option>
+        <option value="premium">Premium</option>
+        <option value="top">Top</option>
+    </select>
+
+    <br><br>
+
+    <label>Продолжительность:</label>
+    <select name="duration_days">
+        {% for days, label in duration_choices %}
+            <option value="{{ days }}">{{ label }}</option>
+        {% endfor %}
+    </select>
+
+    <br><br>
+
+    <h3>Цены продвижения</h3>
+
+    <p>Premium:</p>
+    {% for days, price in promotion_prices.premium.items %}
+        <p>{{ days }} дней — {{ price }} сомони</p>
+    {% endfor %}
+
+    <p>Top:</p>
+    {% for days, price in promotion_prices.top.items %}
+        <p>{{ days }} дней — {{ price }} сомони</p>
+    {% endfor %}
+
+    <br>
+
+    <button type="submit">Создать объявление</button>
+
+</form>
+
+
+</body>
+</html>
